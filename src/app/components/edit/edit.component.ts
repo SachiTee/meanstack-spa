@@ -34,6 +34,7 @@ export class EditComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.id = params.id;
+      console.log('this id', this.id);
       this.issueService.getIssueById(this.id).subscribe(res => {
         this.issue = res;
         this.updateForm.get('title').setValue(this.issue.title);

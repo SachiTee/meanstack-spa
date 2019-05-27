@@ -2,14 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
-
 import Issue from './models/Issue';
-import { nextTick } from 'q';
 
 const app = express();
 const router = express.Router();
 
 app.use(cors());
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, X-Authorization-Token, Content-Type, Accept, X-API-KEY');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  next();
+});
+
 app.use(bodyParser.json());
 
 mongoose.connect('mongodb://localhost:27017/issues');
@@ -55,7 +60,7 @@ router.route('/issues/add').post((req, res) => {
 });
 
 // update request
-router.route('/issues/update/:id').post((req, res) => {
+router.route('/issues/update/:id').put((req, res) => {
   Issue.findById(req.params.id, (err, issue) => {
     if (!issue) {
       return next(new Error('Could not load document'));
@@ -76,7 +81,7 @@ router.route('/issues/update/:id').post((req, res) => {
 });
 
 // delete a record
-router.route('/issues/delete/:id').get((req, res) => {
+router.route('/issues/delete/:id').delete((req, res) => {
   Issue.findByIdAndRemove({ _id: req.params.id}, (err, issue) => {
     if (err) {
       res.json(err);
@@ -88,7 +93,5 @@ router.route('/issues/delete/:id').get((req, res) => {
 
 app.use('/', router);
 
-
-//app.get('/', (req, res) => res.send('Hello World!'));
 app.listen(4000, () => console.log('Express server running on port 4000'));
 
